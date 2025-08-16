@@ -1,14 +1,20 @@
 // Configuración de Firebase - Server3D
 // NOTA: En producción, estas credenciales deben ser protegidas
 
+// Configuración deshabilitada por defecto para evitar errores
+// Los usuarios deben configurar sus propias credenciales de Firebase
 window.firebaseConfig = {
-  apiKey: "AIzaSyBK6Sm3qFHQK-6wPrF3Ag9wFOcKVkPBx9M",
-  authDomain: "server3d-ai.firebaseapp.com",
-  databaseURL: "https://server3d-ai-default-rtdb.firebaseio.com",
-  projectId: "server3d-ai",
-  storageBucket: "server3d-ai.appspot.com",
-  messagingSenderId: "123456789012",
-  appId: "1:123456789012:web:abcdef1234567890"
+  // Descomenta y configura con tus credenciales de Firebase
+  // apiKey: "your-api-key",
+  // authDomain: "your-project.firebaseapp.com",
+  // databaseURL: "https://your-project-default-rtdb.firebaseio.com",
+  // projectId: "your-project",
+  // storageBucket: "your-project.appspot.com",
+  // messagingSenderId: "your-sender-id",
+  // appId: "your-app-id"
+  
+  // Configuración vacía para evitar errores
+  disabled: true
 };
 
 // Configuración de la aplicación

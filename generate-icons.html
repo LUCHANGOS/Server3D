@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Server3D Icon Generator</title>
+</head>
+<body>
+    <h1>Generador de Iconos Server3D</h1>
+    <canvas id="canvas192" width="192" height="192" style="border: 1px solid #ccc; margin: 10px;"></canvas>
+    <canvas id="canvas512" width="512" height="512" style="border: 1px solid #ccc; margin: 10px;"></canvas>
+    
+    <br>
+    <button onclick="generateIcons()">Generar Iconos</button>
+    <button onclick="downloadIcon192()">Descargar 192x192</button>
+    <button onclick="downloadIcon512()">Descargar 512x512</button>
+
+    <script>
+        function drawIcon(canvas) {
+            const ctx = canvas.getContext('2d');
+            const size = canvas.width;
+            const center = size / 2;
+            
+            // Limpiar canvas
+            ctx.clearRect(0, 0, size, size);
+            
+            // Gradiente de fondo
+            const gradient = ctx.createLinearGradient(0, 0, size, size);
+            gradient.addColorStop(0, '#2196F3');
+            gradient.addColorStop(1, '#1976D2');
+            
+            // Círculo de fondo
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(center, center, center * 0.9, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Borde
+            ctx.strokeStyle = '#0D47A1';
+            ctx.lineWidth = size * 0.01;
+            ctx.stroke();
+            
+            // Escala basada en el tamaño del canvas
+            const scale = size / 512;
+            
+            // Base de la impresora
+            ctx.fillStyle = '#37474F';
+            ctx.fillRect(140 * scale, 300 * scale, 232 * scale, 120 * scale);
+            
+            // Marco de la impresora
+            ctx.strokeStyle = '#37474F';
+            ctx.lineWidth = 6 * scale;
+            ctx.strokeRect(160 * scale, 180 * scale, 192 * scale, 140 * scale);
+            
+            // Cama de impresión
+            ctx.fillStyle = '#546E7A';
+            ctx.fillRect(180 * scale, 280 * scale, 152 * scale, 8 * scale);
+            
+            // Cabezal extrusor
+            ctx.fillStyle = '#FF5722';
+            ctx.beginPath();
+            ctx.arc(256 * scale, 240 * scale, 16 * scale, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            ctx.fillStyle = '#D84315';
+            ctx.fillRect(246 * scale, 224 * scale, 20 * scale, 12 * scale);
+            
+            // Panel de control
+            ctx.fillStyle = '#263238';
+            ctx.fillRect(380 * scale, 320 * scale, 60 * scale, 40 * scale);
+            
+            // LEDs del panel
+            ctx.fillStyle = '#4CAF50';
+            ctx.beginPath();
+            ctx.arc(395 * scale, 335 * scale, 3 * scale, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            ctx.fillStyle = '#FF5722';
+            ctx.beginPath();
+            ctx.arc(410 * scale, 335 * scale, 3 * scale, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            ctx.fillStyle = '#2196F3';
+            ctx.beginPath();
+            ctx.arc(425 * scale, 335 * scale, 3 * scale, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Señales WiFi
+            ctx.strokeStyle = '#FFFFFF';
+            ctx.lineWidth = 3 * scale;
+            
+            ctx.beginPath();
+            ctx.arc(120 * scale, 120 * scale, 20 * scale, 0.2, 0.8);
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.arc(120 * scale, 120 * scale, 35 * scale, 0.2, 0.8);
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.arc(120 * scale, 120 * scale, 50 * scale, 0.2, 0.8);
+            ctx.stroke();
+            
+            // Texto "3D"
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = `bold ${48 * scale}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.fillText('3D', center, 450 * scale);
+        }
+        
+        function generateIcons() {
+            const canvas192 = document.getElementById('canvas192');
+            const canvas512 = document.getElementById('canvas512');
+            
+            drawIcon(canvas192);
+            drawIcon(canvas512);
+            
+            console.log('Iconos generados!');
+        }
+        
+        function downloadIcon192() {
+            const canvas = document.getElementById('canvas192');
+            const link = document.createElement('a');
+            link.download = 'icon-192.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+        
+        function downloadIcon512() {
+            const canvas = document.getElementById('canvas512');
+            const link = document.createElement('a');
+            link.download = 'icon-512.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+        
+        // Generar automáticamente al cargar
+        window.onload = generateIcons;
+    </script>
+</body>
+</html>

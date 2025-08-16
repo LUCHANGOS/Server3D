@@ -15,7 +15,23 @@ export class FirebaseClient {
   async initialize() {
     try {
       if (!window.firebaseConfig) {
-        throw new Error('Firebase config no encontrado. Verifica config.js');
+        console.warn('Firebase config no encontrado. Verifica config.js');
+        store.addConsoleMessage('Firebase no configurado - funcionando sin sincronización', 'warning');
+        return false;
+      }
+
+      // Verificar si Firebase está deshabilitado
+      if (window.firebaseConfig.disabled) {
+        console.log('Firebase deshabilitado por configuración');
+        store.addConsoleMessage('Firebase deshabilitado - funcionando en modo local', 'info');
+        return false;
+      }
+
+      // Verificar si las configuraciones esenciales están presentes
+      if (!window.firebaseConfig.apiKey || !window.firebaseConfig.projectId) {
+        console.warn('Configuración de Firebase incompleta');
+        store.addConsoleMessage('Firebase mal configurado - funcionando en modo local', 'warning');
+        return false;
       }
 
       // Inicializar Firebase
@@ -24,6 +40,7 @@ export class FirebaseClient {
       this.database = firebase.database();
 
       console.log('Firebase inicializado correctamente');
+      store.addConsoleMessage('Firebase conectado y sincronizado', 'success');
 
       // Configurar listener de autenticación
       this.auth.onAuthStateChanged(this.onAuthStateChanged.bind(this));
@@ -34,7 +51,7 @@ export class FirebaseClient {
       return true;
     } catch (error) {
       console.error('Error inicializando Firebase:', error);
-      store.addConsoleMessage(`Error Firebase: ${error.message}`, 'error');
+      store.addConsoleMessage(`Firebase error: ${error.message} - funcionando en modo local`, 'warning');
       return false;
     }
   }

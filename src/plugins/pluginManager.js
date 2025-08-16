@@ -207,22 +207,92 @@ export class PluginManager {
   // Cargar plugins del core
   async loadCorePlugins() {
     const corePlugins = [
-      'temperatureMonitor',
-      'gcodeAnalyzer', 
-      'printEstimator',
-      'safetyManager',
-      'historyLogger'
+      { name: 'temperatureMonitor', required: true },
+      { name: 'gcodeAnalyzer', required: true },
+      { name: 'printEstimator', required: false },
+      { name: 'safetyManager', required: true },
+      { name: 'historyLogger', required: true }
     ];
 
-    for (const pluginName of corePlugins) {
+    let loadedCount = 0;
+    let errorCount = 0;
+
+    for (const pluginInfo of corePlugins) {
+      const { name, required } = pluginInfo;
+      
       try {
-        const { default: Plugin } = await import(`./core/${pluginName}.js`);
-        const plugin = new Plugin();
-        this.registerPlugin(pluginName, plugin);
-        await this.activatePlugin(pluginName);
+        const module = await import(`./core/${name}.js`);
+        const PluginClass = module.default || module[Object.keys(module)[0]];
+        
+        if (!PluginClass) {
+          throw new Error(`No se encontró la clase del plugin en ${name}.js`);
+        }
+        
+        const plugin = new PluginClass();
+        this.registerPlugin(name, plugin);
+        await this.activatePlugin(name);
+        
+        loadedCount++;
+        console.log(`✅ Plugin core cargado: ${name}`);
+        
       } catch (error) {
-        console.warn(`No se pudo cargar plugin core '${pluginName}':`, error);
+        errorCount++;
+        
+        if (required) {
+          console.error(`❌ Error cargando plugin core requerido '${name}':`, error.message);
+        } else {
+          console.warn(`⚠️ Plugin core opcional '${name}' no disponible:`, error.message);
+        }
+        
+        // Intentar crear un plugin dummy para los opcionales
+        if (!required) {
+          this.createDummyPlugin(name);
+        }
       }
+    }
+
+    console.log(`🔌 Core plugins: ${loadedCount} cargados, ${errorCount} con errores`);
+  }
+
+  // Crear plugin dummy para reemplazar los faltantes
+  createDummyPlugin(name) {
+    try {
+      const dummyPlugin = {
+        name: name,
+        version: '0.0.0-dummy',
+        
+        getMetadata() {
+          return {
+            name: this.name,
+            version: this.version,
+            description: `Plugin dummy para ${name} (no disponible)`,
+            author: 'Server3D',
+            website: '',
+            dependencies: [],
+            isDummy: true
+          };
+        },
+        
+        async activate() {
+          console.log(`🤖 Plugin dummy activado: ${this.name}`);
+          return true;
+        },
+        
+        async deactivate() {
+          console.log(`🤖 Plugin dummy desactivado: ${this.name}`);
+          return true;
+        },
+        
+        getDefaultSettings() {
+          return {};
+        }
+      };
+      
+      this.registerPlugin(name, dummyPlugin);
+      this.activatePlugin(name);
+      
+    } catch (error) {
+      console.error(`Error creando plugin dummy para '${name}':`, error);
     }
   }
 

@@ -1,0 +1,4 @@
+Deployment check file
+Created: 2024-01-13
+Purpose: Verify that GitHub Pages is deploying from public/ directory
+This file should be served by GitHub Pages if the workflow is working correctly.

@@ -61,6 +61,13 @@ export class UIManager {
     // Progress
     this.elements.progressFill = document.getElementById('progress-fill');
     this.elements.progressText = document.getElementById('progress-text');
+    
+    // G-code file handling
+    this.elements.gcodeFile = document.getElementById('gcode-file');
+    this.elements.fileInfo = document.getElementById('file-info');
+    this.elements.gcodePreview = document.getElementById('gcode-preview-content');
+    this.elements.startGcodeStream = document.getElementById('start-gcode-stream');
+    this.elements.stopGcodeStream = document.getElementById('stop-gcode-stream');
   }
 
   // Configurar event listeners
@@ -95,11 +102,42 @@ export class UIManager {
       });
     }
 
-    // USB Connection
+    // Connection buttons
     if (this.elements.connectUsb) {
       this.elements.connectUsb.addEventListener('click', async () => {
         const baudRate = document.getElementById('baud-rate')?.value || '115200';
         await this.handleUSBConnect(parseInt(baudRate));
+      });
+    }
+
+    if (this.elements.connectBle) {
+      this.elements.connectBle.addEventListener('click', async () => {
+        await this.handleBLEConnect();
+      });
+    }
+
+    // OctoPrint connection
+    if (document.getElementById('connect-octoprint')) {
+      document.getElementById('connect-octoprint').addEventListener('click', async () => {
+        const host = document.getElementById('octoprint-host')?.value.trim();
+        const apiKey = document.getElementById('octoprint-key')?.value.trim();
+        if (host && apiKey) {
+          await this.handleOctoPrintConnect(host, apiKey);
+        } else {
+          store.addConsoleMessage('Introduce host y API key de OctoPrint', 'warning');
+        }
+      });
+    }
+
+    // Moonraker connection
+    if (document.getElementById('connect-moonraker')) {
+      document.getElementById('connect-moonraker').addEventListener('click', async () => {
+        const host = document.getElementById('moonraker-host')?.value.trim();
+        if (host) {
+          await this.handleMoonrakerConnect(host);
+        } else {
+          store.addConsoleMessage('Introduce host de Moonraker', 'warning');
+        }
       });
     }
 
@@ -119,6 +157,25 @@ export class UIManager {
         if (temp && window.currentTransport) {
           window.currentTransport.sendCommand(`M104 S${temp}`);
         }
+      });
+    }
+
+    // G-code file handling
+    if (this.elements.gcodeFile) {
+      this.elements.gcodeFile.addEventListener('change', (e) => {
+        this.handleGcodeFileLoad(e.target.files[0]);
+      });
+    }
+
+    if (this.elements.startGcodeStream) {
+      this.elements.startGcodeStream.addEventListener('click', () => {
+        this.handleStartStreaming();
+      });
+    }
+
+    if (this.elements.stopGcodeStream) {
+      this.elements.stopGcodeStream.addEventListener('click', () => {
+        this.handleStopStreaming();
       });
     }
   }
@@ -232,6 +289,57 @@ export class UIManager {
     }
   }
 
+  // Manejar conexión Bluetooth LE
+  async handleBLEConnect() {
+    try {
+      store.setLoading(true);
+      const { bluetoothTransport } = await import('./transports/bluetooth.js');
+      
+      const success = await bluetoothTransport.connect();
+      if (success) {
+        window.currentTransport = bluetoothTransport;
+      }
+    } catch (error) {
+      store.addConsoleMessage(`Error conectando Bluetooth: ${error.message}`, 'error');
+    } finally {
+      store.setLoading(false);
+    }
+  }
+
+  // Manejar conexión OctoPrint
+  async handleOctoPrintConnect(host, apiKey) {
+    try {
+      store.setLoading(true);
+      const { octoPrintTransport } = await import('./transports/octoprint.js');
+      
+      const success = await octoPrintTransport.connect(host, apiKey);
+      if (success) {
+        window.currentTransport = octoPrintTransport;
+      }
+    } catch (error) {
+      store.addConsoleMessage(`Error conectando OctoPrint: ${error.message}`, 'error');
+    } finally {
+      store.setLoading(false);
+    }
+  }
+
+  // Manejar conexión Moonraker
+  async handleMoonrakerConnect(host) {
+    try {
+      store.setLoading(true);
+      const { moonrakerTransport } = await import('./transports/moonraker.js');
+      
+      const success = await moonrakerTransport.connect(host);
+      if (success) {
+        window.currentTransport = moonrakerTransport;
+      }
+    } catch (error) {
+      store.addConsoleMessage(`Error conectando Moonraker: ${error.message}`, 'error');
+    } finally {
+      store.setLoading(false);
+    }
+  }
+
   // Actualizar status de conexión
   updateConnectionStatus() {
     const connection = store.get('connection');
@@ -316,6 +424,106 @@ export class UIManager {
     
     if (loadingOverlay) {
       loadingOverlay.classList.toggle('hidden', !loading);
+    }
+  }
+
+  // Manejar carga de archivo G-code
+  async handleGcodeFileLoad(file) {
+    if (!file) return;
+
+    try {
+      const { Validator } = await import('./utils/validate.js');
+      const validation = Validator.validateGcodeFile(file);
+      
+      if (!validation.valid) {
+        store.addConsoleMessage(`Error: ${validation.error}`, 'error');
+        return;
+      }
+
+      // Mostrar información del archivo
+      if (this.elements.fileInfo) {
+        this.elements.fileInfo.textContent = `${file.name} (${(file.size/1024).toFixed(1)} KB)`;
+      }
+
+      // Leer contenido
+      const content = await this.readFileContent(file);
+      
+      // Cargar en el streamer
+      const { gcodeStreamer } = await import('./gcodeStreamer.js');
+      const success = await gcodeStreamer.loadFile(file, content);
+      
+      if (success) {
+        // Mostrar preview
+        const { GcodeParser } = await import('./utils/gcode.js');
+        const preview = GcodeParser.getPreview(content, 20);
+        
+        if (this.elements.gcodePreview) {
+          this.elements.gcodePreview.textContent = preview;
+        }
+        
+        // Habilitar botón de streaming
+        if (this.elements.startGcodeStream) {
+          this.elements.startGcodeStream.disabled = false;
+        }
+      }
+      
+    } catch (error) {
+      store.addConsoleMessage(`Error cargando archivo: ${error.message}`, 'error');
+    }
+  }
+
+  // Leer contenido del archivo
+  readFileContent(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = () => reject(new Error('Error leyendo archivo'));
+      
+      reader.readAsText(file);
+    });
+  }
+
+  // Iniciar streaming
+  async handleStartStreaming() {
+    if (!window.currentTransport?.isConnected()) {
+      store.addConsoleMessage('No hay conexión activa para streaming', 'warning');
+      return;
+    }
+
+    try {
+      const { gcodeStreamer } = await import('./gcodeStreamer.js');
+      await gcodeStreamer.start(window.currentTransport);
+      
+      // Deshabilitar botón start, habilitar stop
+      if (this.elements.startGcodeStream) {
+        this.elements.startGcodeStream.disabled = true;
+      }
+      if (this.elements.stopGcodeStream) {
+        this.elements.stopGcodeStream.disabled = false;
+      }
+      
+    } catch (error) {
+      store.addConsoleMessage(`Error iniciando streaming: ${error.message}`, 'error');
+    }
+  }
+
+  // Detener streaming
+  async handleStopStreaming() {
+    try {
+      const { gcodeStreamer } = await import('./gcodeStreamer.js');
+      gcodeStreamer.stop();
+      
+      // Habilitar botón start, deshabilitar stop
+      if (this.elements.startGcodeStream) {
+        this.elements.startGcodeStream.disabled = false;
+      }
+      if (this.elements.stopGcodeStream) {
+        this.elements.stopGcodeStream.disabled = true;
+      }
+      
+    } catch (error) {
+      store.addConsoleMessage(`Error deteniendo streaming: ${error.message}`, 'error');
     }
   }
 

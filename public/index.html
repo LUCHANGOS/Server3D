@@ -3,13 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Server3D - Control Web de Impresoras 3D</title>
-    <!-- v2.0.0 deployed -->
+    <title>Server3D Professional - Sistema de Control Avanzado</title>
+    <!-- v3.0.0 Professional Edition -->
     
     <!-- PWA Meta Tags -->
-    <meta name="description" content="Control web de impresoras 3D con IA local y Firebase">
-    <meta name="theme-color" content="#2196F3">
+    <meta name="description" content="Sistema profesional de control de impresoras 3D con IA, análisis avanzado y gestión integral">
+    <meta name="theme-color" content="#1a365d">
     <link rel="manifest" href="manifest.webmanifest">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
     <!-- Icons -->
     <link rel="icon" href="assets/icons/favicon.ico" type="image/x-icon">
@@ -20,23 +28,105 @@
 </head>
 <body>
     <div id="app">
-        <!-- Header -->
+        <!-- Professional Header -->
         <header class="header">
-            <h1>🖨️ Server3D</h1>
-            <div class="connection-status" id="connection-status">
-                <span class="status-indicator offline"></span>
-                <span class="status-text">Desconectado</span>
+            <div class="header-left">
+                <div class="brand">
+                    <div class="brand-icon">
+                        <i class="fas fa-cubes"></i>
+                    </div>
+                    <div class="brand-info">
+                        <h1>Server3D</h1>
+                        <span class="brand-subtitle">Professional Edition</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="header-center">
+                <div class="system-status">
+                    <div class="status-item">
+                        <i class="fas fa-server"></i>
+                        <span id="system-health">Sistema OK</span>
+                    </div>
+                    <div class="status-item">
+                        <i class="fas fa-thermometer-half"></i>
+                        <span id="temp-status">25°C</span>
+                    </div>
+                    <div class="status-item">
+                        <i class="fas fa-clock"></i>
+                        <span id="uptime">00:00:00</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="header-right">
+                <div class="connection-status" id="connection-status">
+                    <div class="status-indicator offline"></div>
+                    <div class="status-info">
+                        <span class="status-text">Desconectado</span>
+                        <small class="status-detail" id="connection-detail">Sin conexión activa</small>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <button class="header-btn" title="Configuración" id="settings-btn">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                    <button class="header-btn" title="Notificaciones" id="notifications-btn">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge">3</span>
+                    </button>
+                    <button class="header-btn" title="Ayuda" id="help-btn">
+                        <i class="fas fa-question-circle"></i>
+                    </button>
+                </div>
             </div>
         </header>
 
-        <!-- Main Navigation -->
-        <nav class="tab-nav">
-            <button class="tab-btn active" data-tab="connection">Conexión</button>
-            <button class="tab-btn" data-tab="controls">Controles</button>
-            <button class="tab-btn" data-tab="gcode">G-code</button>
-            <button class="tab-btn" data-tab="status">Estado</button>
-            <button class="tab-btn" data-tab="analytics">📊 Analytics</button>
-            <button class="tab-btn" data-tab="costs">💰 Costos</button>
+        <!-- Professional Navigation -->
+        <nav class="main-navigation">
+            <div class="nav-container">
+                <div class="nav-tabs">
+                    <button class="nav-tab active" data-tab="connection">
+                        <i class="fas fa-plug"></i>
+                        <span>Conexión</span>
+                        <div class="tab-indicator"></div>
+                    </button>
+                    <button class="nav-tab" data-tab="controls">
+                        <i class="fas fa-gamepad"></i>
+                        <span>Controles</span>
+                        <div class="tab-indicator"></div>
+                    </button>
+                    <button class="nav-tab" data-tab="gcode">
+                        <i class="fas fa-file-code"></i>
+                        <span>G-Code</span>
+                        <div class="tab-indicator"></div>
+                    </button>
+                    <button class="nav-tab" data-tab="status">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Estado</span>
+                        <div class="tab-indicator"></div>
+                    </button>
+                    <button class="nav-tab" data-tab="analytics">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Analytics</span>
+                        <div class="tab-indicator"></div>
+                    </button>
+                    <button class="nav-tab" data-tab="costs">
+                        <i class="fas fa-calculator"></i>
+                        <span>Costos</span>
+                        <div class="tab-indicator"></div>
+                    </button>
+                </div>
+                <div class="nav-actions">
+                    <button class="nav-action-btn" id="emergency-stop" title="Paro de emergencia">
+                        <i class="fas fa-stop-circle"></i>
+                    </button>
+                    <div class="nav-divider"></div>
+                    <button class="nav-action-btn" id="fullscreen-btn" title="Pantalla completa">
+                        <i class="fas fa-expand"></i>
+                    </button>
+                </div>
+            </div>
         </nav>
 
         <!-- Tab Content -->

@@ -18,6 +18,32 @@ export class PrintEstimatorPlugin {
     }
     
     /**
+     * Metadatos del plugin (requerido por PluginManager)
+     */
+    getMetadata() {
+        return {
+            name: this.name,
+            version: this.version,
+            description: this.description,
+            author: this.author,
+            website: 'https://github.com/LUCHANGOS/Server3D',
+            dependencies: []
+        };
+    }
+    
+    /**
+     * Configuración por defecto
+     */
+    getDefaultSettings() {
+        return {
+            filamentDensity: 1.24, // g/cm³ para PLA
+            filamentDiameter: 1.75, // mm
+            defaultFeedRate: 1500, // mm/min
+            heatingTime: 180 // segundos
+        };
+    }
+    
+    /**
      * Inicializa el plugin
      */
     async activate(context) {

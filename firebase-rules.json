@@ -1,0 +1,22 @@
+{
+  "rules": {
+    ".read": "auth != null",
+    ".write": "auth != null",
+    "users": {
+      "$uid": {
+        ".read": "auth != null && (auth.uid == $uid || auth.token.admin == true)",
+        ".write": "auth != null && (auth.uid == $uid || auth.token.admin == true)"
+      }
+    },
+    "shared": {
+      "$shareCode": {
+        ".read": "auth != null",
+        ".write": "auth != null"
+      }
+    },
+    "public": {
+      ".read": true,
+      ".write": "auth != null"
+    }
+  }
+}

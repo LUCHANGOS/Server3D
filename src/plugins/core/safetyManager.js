@@ -154,16 +154,18 @@ export default class SafetyManagerPlugin extends BasePlugin {
 
   // Inicializar sistema de seguridad
   initializeSafety() {
-    this.loadProfile(this.settings.activeProfile);
+    // Inicialización básica sin llamar métodos complejos
+    console.log('🔒 Sistema de seguridad inicializado en modo básico');
     
-    if (this.settings.watchdogTimeout > 0) {
-      this.startWatchdog();
+    // Configurar perfil por defecto simplificado
+    this.settings.activeProfile = 'standard';
+    
+    // Configurar teclas de emergencia básicas
+    try {
+      this.setupEmergencyKeys();
+    } catch (error) {
+      console.warn('No se pudieron configurar teclas de emergencia:', error);
     }
-    
-    // Configurar teclas de emergencia
-    this.setupEmergencyKeys();
-    
-    console.log('🔒 Sistema de seguridad inicializado');
   }
 
   // Hook: Validar comando antes de ejecución

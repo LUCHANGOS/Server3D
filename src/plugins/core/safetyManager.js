@@ -71,17 +71,15 @@ export default class SafetyManagerPlugin extends BasePlugin {
     }
 
     // Registrar hooks críticos con alta prioridad
-    this.addHook('before:command', this.validateCommand.bind(this), 1);
-    this.addHook('before:connect', this.onBeforeConnect.bind(this), 1);
-    this.addHook('after:connect', this.onAfterConnect.bind(this), 1);
-    this.addHook('before:disconnect', this.onBeforeDisconnect.bind(this), 1);
-    this.addHook('temperature:update', this.monitorTemperatures.bind(this), 1);
-    this.addHook('position:update', this.monitorPosition.bind(this), 1);
-    this.addHook('before:gcode:stream', this.validateGcodeStream.bind(this), 1);
-    this.addHook('error:occurred', this.handleError.bind(this), 1);
+    if (this.pluginManager) {
+      this.addHook('before:command', this.validateCommand.bind(this), 1);
+      this.addHook('temperature:update', this.monitorTemperatures.bind(this), 1);
+      this.addHook('position:update', this.monitorPosition.bind(this), 1);
+      this.addHook('before:gcode:stream', this.validateGcodeStream.bind(this), 1);
+      this.addHook('error:occurred', this.handleError.bind(this), 1);
+    }
 
     console.log('🛡️ Gestor de seguridad activado');
-    this.logSafetyStatus();
   }
 
   async deactivate() {
@@ -476,6 +474,12 @@ export default class SafetyManagerPlugin extends BasePlugin {
         this.clearEmergencyState();
       }
     });
+  }
+  
+  // Hook: manejar errores
+  async handleError(error) {
+    console.warn('🛡️ Safety Manager: Error detectado:', error);
+    return error;
   }
 
   // Watchdog timer

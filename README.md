@@ -1,19 +1,60 @@
-# Server3D - Control Web de Impresoras 3D
+# Server3D v2.0 - Control Avanzado de Impresoras 3D 🚀
 
-Una aplicación web PWA para controlar impresoras 3D vía USB, Bluetooth, OctoPrint y Moonraker con Firebase Realtime Database y "IA" local para comandos en español.
+Una aplicación web PWA de próxima generación para el control profesional de impresoras 3D con sistema de plugins extensible, IA local avanzada, monitoreo inteligente y analytics en tiempo real.
 
-## 🌟 Características
+## 🌟 Características Principales
 
-- **Conexiones múltiples**: USB (Web Serial), Bluetooth (Web Bluetooth), OctoPrint y Moonraker
-- **IA local**: Interpreta comandos en español natural
-- **PWA**: Funciona offline, instalable
-- **Firebase RTDB**: Sincronización en tiempo real
-- **G-code Streaming**: Cola inteligente con control de flujo
-- **Interfaz moderna**: Diseño responsive con tabs
+### 🔌 Sistema de Plugins Extensible
+- **Arquitectura modular**: Sistema de plugins con hooks y eventos
+- **Plugins del core**: Monitor de temperatura, analizador de G-code, gestor de seguridad
+- **API para desarrolladores**: Crea tus propios plugins personalizados
+- **Configuración dinámica**: Activa/desactiva plugins según necesidades
+
+### 🧪 Inteligencia Artificial Mejorada
+- **IA local avanzada**: Interpreta comandos en español natural con mayor precisión
+- **Análisis predictivo**: Detecta problemas antes de que ocurran
+- **Sugerencias inteligentes**: Optimizaciones automáticas basadas en patrones
+- **Aprendizaje de uso**: Se adapta a tu flujo de trabajo
+
+### 🛡️ Sistema de Seguridad Avanzado
+- **Perfiles de seguridad**: Conservador, estándar y avanzado
+- **Protección térmica**: Detección de thermal runaway y alertas inteligentes
+- **Watchdog system**: Monitoreo continuo del sistema
+- **Paradas de emergencia**: Múltiples métodos de activación
+- **Validación de comandos**: Filtrado de comandos peligrosos
+
+### 📊 Analytics y Estadísticas
+- **Dashboard completo**: Visualización en tiempo real del estado del sistema
+- **Historial de impresiones**: Seguimiento detallado con tags y notas
+- **Análisis de G-code**: Predicciones de tiempo, material y calidad
+- **Métricas de rendimiento**: Estadísticas de éxito, tiempo total, material usado
+- **Exportación de datos**: Respaldos y análisis externos
+
+### 🌡️ Monitoreo Inteligente
+- **Temperatura predictiva**: Alertas antes de problemas críticos
+- **Historial térmico**: Gráficos y tendencias de temperatura
+- **Detección de anomalías**: Fluctuaciones y desviaciones inusuales
+- **Notificaciones**: Alertas de escritorio y sonoras
+
+### 🔌 Conexiones Múltiples
+- **USB Serial**: Conexión directa vía Web Serial API
+- **Bluetooth LE**: Soporte para UART/NUS sobre BLE
+- **OctoPrint**: Integración completa REST + WebSocket
+- **Moonraker**: Control nativo de Klipper
+- **Auto-detección**: Reconocimiento automático de dispositivos
+
+### 🎨 Interfaz de Nueva Generación
+- **Diseño moderno**: UI renovada con Material Design 3.0
+- **Responsive**: Optimizada para desktop, tablet y móvil
+- **Modo oscuro**: Soporte completo para temas
+- **Accesibilidad**: Cumple con estándares WCAG 2.1
+- **PWA avanzada**: Instalación nativa en cualquier plataforma
 
 ## 🚀 Acceso Directo
 
-**URL de la aplicación**: https://luchangos.github.io/Server3D/
+**Server3D v2.0**: [https://luchangos.github.io/Server3D/](https://luchangos.github.io/Server3D/)
+
+> ⚡ **Novedad**: Ahora con sistema de plugins, analytics avanzados y protección de seguridad mejorada
 
 ## 📋 Compatibilidad
 
@@ -103,6 +144,125 @@ Ejemplos de comandos que puedes escribir:
 - Solo metadatos se guardan en Firebase (no el contenido del archivo)
 - Streaming con control de flujo y manejo de errores
 
+## 📊 Analytics y Monitoreo
+
+### Pestaña Analytics
+Server3D v2.0 incluye una pestaña dedicada de analytics con:
+
+#### 📝 Dashboard de Sistema
+- **Estado de plugins**: Monitoreo en tiempo real de todos los plugins
+- **Métricas del sistema**: Tiempo activo, comandos enviados, memoria usada
+- **Estado de seguridad**: Perfil activo, alertas y protecciones
+- **Monitor térmico**: Historial de temperaturas y alertas críticas
+
+#### 🖨️ Estadísticas de Impresión
+- **Impresiones totales**: Contador de trabajos completados
+- **Tasa de éxito**: Porcentaje de impresiones exitosas
+- **Tiempo acumulado**: Horas totales de impresión
+- **Material consumido**: Metros de filamento utilizados
+
+#### 🔍 Análisis de G-code
+- **Complejidad del archivo**: Evaluación automática
+- **Tiempo estimado**: Predicción mejorada vs slicer
+- **Calidad predictiva**: Score basado en parámetros
+- **Sugerencias de optimización**: Mejoras automáticas
+- **Detección de problemas**: Alertas preventivas
+
+### Controles Disponibles
+- **🔄 Actualizar**: Refresca todos los datos en tiempo real
+- **💾 Exportar Datos**: Descarga historial en formato JSON
+- **🗑️ Limpiar Historial**: Reset de datos almacenados
+- **🐛 Info Debug**: Información técnica del sistema
+
+## 🛡️ Seguridad Avanzada
+
+### Perfiles de Seguridad
+
+#### Conservador (Principiantes)
+- Temperaturas limitadas: Hotend ≤250°C, Cama ≤80°C
+- Velocidades reducidas: Máx 3000mm/min
+- Filtrado estricto de comandos
+- Volumen de construcción limitado
+
+#### Estándar (Uso General)
+- Temperaturas normales: Hotend ≤280°C, Cama ≤120°C
+- Velocidades estándar: Máx 6000mm/min
+- Filtrado moderado
+- Protección térmica activa
+
+#### Avanzado (Usuarios Experimentados)
+- Sin límites de temperatura (hasta 300°C)
+- Velocidades altas permitidas
+- Mínimo filtrado
+- Máxima flexibilidad
+
+### Funciones de Emergencia
+- **Ctrl+Shift+E**: Parada de emergencia inmediata
+- **F1**: Limpiar estado de emergencia
+- **Escape**: Parada de emergencia con conexión activa
+- **Watchdog**: Detección de bloqueos del sistema
+
+## 🔌 Desarrollo de Plugins
+
+### API para Desarrolladores
+
+```javascript
+// Estructura básica de un plugin
+import { BasePlugin } from './pluginManager.js';
+
+export default class MiPlugin extends BasePlugin {
+  constructor() {
+    super('miPlugin', '1.0.0');
+  }
+
+  getMetadata() {
+    return {
+      name: 'Mi Plugin Personalizado',
+      version: '1.0.0',
+      description: 'Descripción del plugin',
+      author: 'Tu Nombre',
+      dependencies: []
+    };
+  }
+
+  async activate(pluginManager) {
+    await super.activate(pluginManager);
+    
+    // Registrar hooks
+    this.addHook('before:command', this.onCommand.bind(this));
+    this.addHook('temperature:update', this.onTemperature.bind(this));
+  }
+
+  async onCommand(command) {
+    // Lógica personalizada
+    console.log('Comando recibido:', command);
+    return command;
+  }
+
+  async onTemperature(data) {
+    // Monitoreo personalizado
+    console.log('Temperatura:', data);
+    return data;
+  }
+}
+```
+
+### Hooks Disponibles
+- `before:connect` / `after:connect`
+- `before:disconnect` / `after:disconnect`
+- `before:command` / `after:command`
+- `before:gcode:stream` / `after:gcode:stream`
+- `temperature:update`
+- `position:update`
+- `print:status:change`
+- `error:occurred`
+
+### Registro de Plugins
+```javascript
+// Registrar plugin externo
+server3d.registerExternalPlugin('miPlugin', MiPluginClass);
+```
+
 ## 🔧 Desarrollo Local
 
 ```bash
@@ -125,6 +285,19 @@ npx serve public -s
 ```
 
 **Importante**: Las APIs Web Serial y Bluetooth requieren HTTPS. En desarrollo local usa certificados auto-firmados o ngrok.
+
+### Comandos de Debug
+```javascript
+// En la consola del navegador
+server3d.debug()           // Información completa del sistema
+server3d.help()            // Lista de comandos disponibles
+server3d.getExtendedInfo() // Estado detallado
+server3d.getAppStats()     // Estadísticas de la aplicación
+
+// Plugins
+pluginManager.listPlugins()    // Listar todos los plugins
+pluginManager.getDebugInfo()   // Info de debug de plugins
+```
 
 ## 📁 Estructura del Proyecto
 

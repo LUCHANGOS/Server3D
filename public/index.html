@@ -34,6 +34,7 @@
             <button class="tab-btn" data-tab="controls">Controles</button>
             <button class="tab-btn" data-tab="gcode">G-code</button>
             <button class="tab-btn" data-tab="status">Estado</button>
+            <button class="tab-btn" data-tab="analytics">📊 Analytics</button>
         </nav>
 
         <!-- Tab Content -->
@@ -262,6 +263,142 @@
                             <input type="text" id="manual-gcode" placeholder="G-code manual (ej: M105)">
                             <button id="send-gcode" class="btn btn-small">Enviar</button>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analytics Tab -->
+            <div class="tab-content" id="analytics-tab">
+                <div class="analytics-section">
+                    <h2>📊 Analytics y Estadísticas</h2>
+                    
+                    <!-- System Status Cards -->
+                    <div class="status-cards">
+                        <div class="status-card">
+                            <h3>🚀 Sistema</h3>
+                            <div class="status-item">
+                                <span class="status-label">Versión:</span>
+                                <span class="status-value" id="system-version">--</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="status-label">Tiempo activo:</span>
+                                <span class="status-value" id="system-uptime">--</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="status-label">Comandos enviados:</span>
+                                <span class="status-value" id="commands-sent">--</span>
+                            </div>
+                        </div>
+
+                        <div class="status-card">
+                            <h3>🔌 Plugins</h3>
+                            <div class="status-item">
+                                <span class="status-label">Activos:</span>
+                                <span class="status-value" id="plugins-active">--</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="status-label">Total:</span>
+                                <span class="status-value" id="plugins-total">--</span>
+                            </div>
+                            <div class="plugin-list" id="plugin-list">--</div>
+                        </div>
+
+                        <div class="status-card">
+                            <h3>🛡️ Seguridad</h3>
+                            <div class="status-item">
+                                <span class="status-label">Estado:</span>
+                                <span class="status-value" id="security-status">--</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="status-label">Perfil activo:</span>
+                                <span class="status-value" id="security-profile">--</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="status-label">Alertas:</span>
+                                <span class="status-value" id="security-alerts">--</span>
+                            </div>
+                        </div>
+
+                        <div class="status-card">
+                            <h3>🌡️ Temperatura</h3>
+                            <div class="status-item">
+                                <span class="status-label">Monitoreo:</span>
+                                <span class="status-value" id="temp-monitoring">--</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="status-label">Historial:</span>
+                                <span class="status-value" id="temp-history">--</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="status-label">Alertas críticas:</span>
+                                <span class="status-value" id="temp-critical">--</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Print Statistics -->
+                    <div class="print-stats-section">
+                        <h3>🖨️ Estadísticas de Impresión</h3>
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <div class="stat-number" id="total-prints">--</div>
+                                <div class="stat-label">Impresiones totales</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number" id="success-rate">--%</div>
+                                <div class="stat-label">Tasa de éxito</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number" id="total-time">--h</div>
+                                <div class="stat-label">Tiempo total</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number" id="filament-used">--m</div>
+                                <div class="stat-label">Filamento usado</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Current Session -->
+                    <div class="current-session-section">
+                        <h3>📝 Sesión Actual</h3>
+                        <div class="session-info" id="current-session">
+                            <p>No hay sesión activa</p>
+                        </div>
+                    </div>
+
+                    <!-- Analysis Results -->
+                    <div class="analysis-section" id="analysis-results" style="display: none;">
+                        <h3>📊 Análisis de G-code</h3>
+                        <div class="analysis-summary">
+                            <div class="analysis-item">
+                                <span class="analysis-label">Complejidad:</span>
+                                <span class="analysis-value" id="analysis-complexity">--</span>
+                            </div>
+                            <div class="analysis-item">
+                                <span class="analysis-label">Tiempo estimado:</span>
+                                <span class="analysis-value" id="analysis-time">--</span>
+                            </div>
+                            <div class="analysis-item">
+                                <span class="analysis-label">Capas:</span>
+                                <span class="analysis-value" id="analysis-layers">--</span>
+                            </div>
+                            <div class="analysis-item">
+                                <span class="analysis-label">Calidad:</span>
+                                <span class="analysis-value" id="analysis-quality">--</span>
+                            </div>
+                        </div>
+                        
+                        <div class="analysis-issues" id="analysis-issues"></div>
+                        <div class="analysis-suggestions" id="analysis-suggestions"></div>
+                    </div>
+
+                    <!-- Control Buttons -->
+                    <div class="analytics-controls">
+                        <button id="refresh-analytics" class="btn btn-primary">🔄 Actualizar</button>
+                        <button id="export-stats" class="btn btn-secondary">💾 Exportar Datos</button>
+                        <button id="clear-history" class="btn btn-warning">🗑️ Limpiar Historial</button>
+                        <button id="debug-info" class="btn btn-info">🐛 Info Debug</button>
                     </div>
                 </div>
             </div>

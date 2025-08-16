@@ -335,45 +335,53 @@ class CostCalculatorPlugin {
         return `
             <div class="cost-calculator">
                 <div class="cost-header">
-                    <h2><i class="fas fa-calculator"></i> Calculadora de Costos</h2>
-                    <div class="cost-actions">
-                        <button id="refreshCosts" class="btn btn-secondary">
-                            <i class="fas fa-sync"></i> Actualizar
-                        </button>
-                        <button id="exportCosts" class="btn btn-primary">
-                            <i class="fas fa-download"></i> Exportar
-                        </button>
-                        <button id="costSettings" class="btn btn-info">
-                            <i class="fas fa-cog"></i> Configuración
-                        </button>
+                    <div class="cost-header-content">
+                        <h2>
+                            <div class="icon">💰</div>
+                            Sistema de Cotización Professional
+                        </h2>
+                        <div class="cost-actions">
+                            <button id="refreshCosts" class="btn">
+                                <i class="fas fa-sync"></i> Actualizar
+                            </button>
+                            <button id="exportCosts" class="btn">
+                                <i class="fas fa-download"></i> Exportar
+                            </button>
+                            <button id="costSettings" class="btn">
+                                <i class="fas fa-cog"></i> Configuración
+                            </button>
+                        </div>
                     </div>
                 </div>
                 
                 <div class="cost-grid">
                     <div class="cost-section">
-                        <h3>Calculadora Rápida</h3>
+                        <h3>
+                            <div class="cost-section-icon">📈</div>
+                            Calculadora de Cotización
+                        </h3>
                         <div class="cost-form">
                             <div class="form-row">
-                                <label>Material:</label>
+                                <label>📋 Tipo de Material</label>
                                 <select id="materialSelect">
                                     ${Object.entries(this.costConfig.materials).map(([key, mat]) => 
-                                        `<option value="${key}">${mat.name} - $${mat.price.toLocaleString()}/kg</option>`
+                                        `<option value="${key}">${mat.name} - $${mat.price.toLocaleString('es-CO')}/kg</option>`
                                     ).join('')}
                                 </select>
                             </div>
                             
                             <div class="form-row">
-                                <label>Peso (gramos):</label>
-                                <input type="number" id="weightInput" min="0" step="0.1" placeholder="0.0">
+                                <label>⚖️ Peso del Objeto (gramos)</label>
+                                <input type="number" id="weightInput" min="0" step="0.1" placeholder="Ej: 25.5">
                             </div>
                             
                             <div class="form-row">
-                                <label>Tiempo (minutos):</label>
-                                <input type="number" id="timeInput" min="0" step="1" placeholder="0">
+                                <label>⏱️ Tiempo de Impresión (minutos)</label>
+                                <input type="number" id="timeInput" min="0" step="1" placeholder="Ej: 120">
                             </div>
                             
                             <div class="form-row">
-                                <label>Impresora:</label>
+                                <label>🖨️ Modelo de Impresora</label>
                                 <select id="printerSelect">
                                     ${Object.entries(this.costConfig.printers).map(([key, printer]) => 
                                         `<option value="${key}">${printer.name}</option>`
@@ -381,37 +389,53 @@ class CostCalculatorPlugin {
                                 </select>
                             </div>
                             
-                            <div class="form-row">
-                                <label>
-                                    <input type="checkbox" id="includeLaborCheck">
-                                    Incluir mano de obra
+                            <div class="checkbox-row">
+                                <input type="checkbox" id="includeLaborCheck">
+                                <label for="includeLaborCheck">
+                                    👷 Incluir costos de mano de obra especializada
                                 </label>
                             </div>
                             
-                            <button id="calculateBtn" class="btn btn-success">
-                                <i class="fas fa-calculator"></i> Calcular Costo
-                            </button>
+                            <div class="form-submit">
+                                <button id="calculateBtn" class="btn-calculate">
+                                    <i class="fas fa-calculator"></i> 
+                                    Generar Cotización Professional
+                                </button>
+                            </div>
                         </div>
                     </div>
                     
                     <div class="cost-section">
-                        <h3>Resultado del Cálculo</h3>
+                        <h3>
+                            <div class="cost-section-icon">📊</div>
+                            Cotización Professional
+                        </h3>
                         <div id="costResult" class="cost-result">
-                            <p class="text-muted">Ingresa los datos y presiona calcular</p>
+                            <div style="text-align: center; color: #64748b; font-style: italic; padding: 2rem;">
+                                <div style="font-size: 3rem; margin-bottom: 1rem;">📋</div>
+                                <p>Complete los campos del formulario y genere su cotización professional</p>
+                                <small>Todos los cálculos incluyen IVA del 19% según normativa colombiana</small>
+                            </div>
                         </div>
                     </div>
                 </div>
                 
                 <div class="cost-grid">
                     <div class="cost-section">
-                        <h3>Estadísticas Generales</h3>
+                        <h3>
+                            <div class="cost-section-icon">📈</div>
+                            Análisis de Rentabilidad
+                        </h3>
                         <div id="costStats" class="stats-grid">
                             <!-- Estadísticas se cargan dinámicamente -->
                         </div>
                     </div>
                     
                     <div class="cost-section">
-                        <h3>Historial Reciente</h3>
+                        <h3>
+                            <div class="cost-section-icon">📏</div>
+                            Historial de Cotizaciones
+                        </h3>
                         <div id="costHistory" class="cost-history">
                             <!-- Historial se carga dinámicamente -->
                         </div>
@@ -419,7 +443,10 @@ class CostCalculatorPlugin {
                 </div>
                 
                 <div class="cost-section">
-                    <h3>Configuración de Precios</h3>
+                    <h3>
+                        <div class="cost-section-icon">⚙️</div>
+                        Configuración de Tarifas
+                    </h3>
                     <div id="priceConfig" class="price-config">
                         <!-- Configuración se carga dinámicamente -->
                     </div>

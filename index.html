@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server3D - Control Web de Impresoras 3D</title>
+    <!-- v2.0.0 deployed -->
+    
+    <!-- PWA Meta Tags -->
+    <meta name="description" content="Control web de impresoras 3D con IA local y Firebase">
+    <meta name="theme-color" content="#2196F3">
+    <link rel="manifest" href="manifest.webmanifest">
+    
+    <!-- Icons -->
+    <link rel="icon" href="assets/icons/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Header -->
+        <header class="header">
+            <h1>🖨️ Server3D</h1>
+            <div class="connection-status" id="connection-status">
+                <span class="status-indicator offline"></span>
+                <span class="status-text">Desconectado</span>
+            </div>
+        </header>
+
+        <!-- Main Navigation -->
+        <nav class="tab-nav">
+            <button class="tab-btn active" data-tab="connection">Conexión</button>
+            <button class="tab-btn" data-tab="controls">Controles</button>
+            <button class="tab-btn" data-tab="gcode">G-code</button>
+            <button class="tab-btn" data-tab="status">Estado</button>
+            <button class="tab-btn" data-tab="analytics">📊 Analytics</button>
+        </nav>
+
+        <!-- Tab Content -->
+        <main class="main-content">
+            
+            <!-- Connection Tab -->
+            <div class="tab-content active" id="connection-tab">
+                <div class="connection-section">
+                    <h2>🔌 Conexiones</h2>
+                    
+                    <!-- USB Serial -->
+                    <div class="connection-card">
+                        <h3>USB Serial</h3>
+                        <div class="connection-controls">
+                            <select id="baud-rate">
+                                <option value="115200">115200</option>
+                                <option value="250000">250000</option>
+                            </select>
+                            <button id="connect-usb" class="btn btn-primary">Conectar USB</button>
+                        </div>
+                        <p class="help-text">Requiere HTTPS y navegador compatible (Chrome/Edge)</p>
+                    </div>
+
+                    <!-- Bluetooth LE -->
+                    <div class="connection-card">
+                        <h3>Bluetooth LE</h3>
+                        <div class="connection-controls">
+                            <button id="connect-ble" class="btn btn-primary">Conectar BLE</button>
+                        </div>
+                        <p class="help-text">Solo BLE UART/NUS, no Bluetooth clásico</p>
+                    </div>
+
+                    <!-- OctoPrint -->
+                    <div class="connection-card">
+                        <h3>OctoPrint</h3>
+                        <div class="connection-controls">
+                            <input type="text" id="octoprint-host" placeholder="192.168.1.100:5000">
+                            <input type="text" id="octoprint-key" placeholder="API Key">
+                            <button id="connect-octoprint" class="btn btn-primary">Conectar</button>
+                        </div>
+                        <p class="help-text">REST API + WebSocket</p>
+                    </div>
+
+                    <!-- Moonraker -->
+                    <div class="connection-card">
+                        <h3>Moonraker</h3>
+                        <div class="connection-controls">
+                            <input type="text" id="moonraker-host" placeholder="192.168.1.100:7125">
+                            <button id="connect-moonraker" class="btn btn-primary">Conectar</button>
+                        </div>
+                        <p class="help-text">Klipper via WebSocket</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Controls Tab -->
+            <div class="tab-content" id="controls-tab">
+                <div class="controls-section">
+                    
+                    <!-- AI Command Input -->
+                    <div class="ai-command-section">
+                        <h2>🤖 Comandos en Español</h2>
+                        <div class="command-input-group">
+                            <input type="text" id="ai-command" 
+                                   placeholder="Ej: 'calentar hotend a 200 grados', 'home ejes', 'mover X 10mm'">
+                            <button id="send-ai-command" class="btn btn-secondary">Enviar</button>
+                        </div>
+                        <div class="command-examples">
+                            <small>Ejemplos: "pausar impresión", "velocidad 120%", "detener todo"</small>
+                        </div>
+                    </div>
+
+                    <!-- Temperature Controls -->
+                    <div class="temp-section">
+                        <h2>🌡️ Temperaturas</h2>
+                        <div class="temp-controls">
+                            <div class="temp-control">
+                                <label>Hotend (°C)</label>
+                                <input type="range" id="hotend-temp" min="0" max="300" value="0">
+                                <span id="hotend-temp-value">0°C</span>
+                                <button id="set-hotend-temp" class="btn btn-small">Set</button>
+                            </div>
+                            <div class="temp-control">
+                                <label>Cama (°C)</label>
+                                <input type="range" id="bed-temp" min="0" max="120" value="0">
+                                <span id="bed-temp-value">0°C</span>
+                                <button id="set-bed-temp" class="btn btn-small">Set</button>
+                            </div>
+                            <div class="temp-control">
+                                <label>Ventilador (%)</label>
+                                <input type="range" id="fan-speed" min="0" max="100" value="0">
+                                <span id="fan-speed-value">0%</span>
+                                <button id="set-fan-speed" class="btn btn-small">Set</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Movement Controls -->
+                    <div class="movement-section">
+                        <h2>🎛️ Movimiento</h2>
+                        <div class="movement-controls">
+                            <div class="home-controls">
+                                <button id="home-all" class="btn btn-warning">Home Todo</button>
+                                <button id="home-x" class="btn btn-small">X</button>
+                                <button id="home-y" class="btn btn-small">Y</button>
+                                <button id="home-z" class="btn btn-small">Z</button>
+                            </div>
+                            <div class="jog-controls">
+                                <label>Distancia:</label>
+                                <select id="jog-distance">
+                                    <option value="0.1">0.1mm</option>
+                                    <option value="1" selected>1mm</option>
+                                    <option value="10">10mm</option>
+                                    <option value="100">100mm</option>
+                                </select>
+                                <div class="axis-controls">
+                                    <div class="axis-control">
+                                        <label>X:</label>
+                                        <button id="move-x-neg" class="btn btn-small">-</button>
+                                        <button id="move-x-pos" class="btn btn-small">+</button>
+                                    </div>
+                                    <div class="axis-control">
+                                        <label>Y:</label>
+                                        <button id="move-y-neg" class="btn btn-small">-</button>
+                                        <button id="move-y-pos" class="btn btn-small">+</button>
+                                    </div>
+                                    <div class="axis-control">
+                                        <label>Z:</label>
+                                        <button id="move-z-neg" class="btn btn-small">-</button>
+                                        <button id="move-z-pos" class="btn btn-small">+</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Print Controls -->
+                    <div class="print-section">
+                        <h2>⚡ Control de Impresión</h2>
+                        <div class="print-controls">
+                            <button id="print-start" class="btn btn-success">▶️ Iniciar</button>
+                            <button id="print-pause" class="btn btn-warning">⏸️ Pausar</button>
+                            <button id="print-resume" class="btn btn-info">▶️ Reanudar</button>
+                            <button id="print-stop" class="btn btn-danger">⏹️ Detener</button>
+                        </div>
+                        <div class="speed-control">
+                            <label>Velocidad de impresión (%):</label>
+                            <input type="range" id="print-speed" min="50" max="200" value="100">
+                            <span id="print-speed-value">100%</span>
+                            <button id="set-print-speed" class="btn btn-small">Set</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- G-code Tab -->
+            <div class="tab-content" id="gcode-tab">
+                <div class="gcode-section">
+                    <h2>📄 Carga de G-code</h2>
+                    
+                    <div class="file-upload">
+                        <input type="file" id="gcode-file" accept=".gcode,.g,.txt">
+                        <label for="gcode-file" class="btn btn-secondary">📁 Seleccionar Archivo</label>
+                        <span id="file-info"></span>
+                    </div>
+                    
+                    <div class="gcode-preview">
+                        <h3>Vista previa:</h3>
+                        <pre id="gcode-preview-content"></pre>
+                    </div>
+                    
+                    <div class="gcode-controls">
+                        <button id="start-gcode-stream" class="btn btn-primary">🚀 Iniciar Streaming</button>
+                        <button id="stop-gcode-stream" class="btn btn-danger">⏹️ Detener</button>
+                    </div>
+                    
+                    <div class="streaming-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progress-fill"></div>
+                        </div>
+                        <div class="progress-info">
+                            <span id="progress-text">0% (0/0 líneas)</span>
+                            <span id="progress-time">--:--</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Status Tab -->
+            <div class="tab-content" id="status-tab">
+                <div class="status-section">
+                    <h2>📊 Estado</h2>
+                    
+                    <!-- Current Temperatures -->
+                    <div class="current-temps">
+                        <h3>🌡️ Temperaturas Actuales</h3>
+                        <div class="temp-readings">
+                            <div class="temp-reading">
+                                <span class="temp-label">Hotend:</span>
+                                <span id="current-hotend-temp">--°C</span>
+                                <span class="temp-target">/ <span id="target-hotend-temp">--</span>°C</span>
+                            </div>
+                            <div class="temp-reading">
+                                <span class="temp-label">Cama:</span>
+                                <span id="current-bed-temp">--°C</span>
+                                <span class="temp-target">/ <span id="target-bed-temp">--</span>°C</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Position -->
+                    <div class="position-section">
+                        <h3>📍 Posición</h3>
+                        <div class="position-readings">
+                            <span>X: <span id="pos-x">--</span>mm</span>
+                            <span>Y: <span id="pos-y">--</span>mm</span>
+                            <span>Z: <span id="pos-z">--</span>mm</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Console Log -->
+                    <div class="console-section">
+                        <h3>💬 Console</h3>
+                        <div class="console" id="console-log"></div>
+                        <div class="console-input">
+                            <input type="text" id="manual-gcode" placeholder="G-code manual (ej: M105)">
+                            <button id="send-gcode" class="btn btn-small">Enviar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analytics Tab -->
+            <div class="tab-content" id="analytics-tab">
+                <div class="analytics-section">
+                    <h2>📊 Analytics y Estadísticas</h2>
+                    
+                    <!-- System Status Cards -->
+                    <div class="status-cards">
+                        <div class="status-card">
+                            <h3>🚀 Sistema</h3>
+                            <div class="status-item">
+                                <span class="status-label">Versión:</span>
+                                <span class="status-value" id="system-version">--</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="status-label">Tiempo activo:</span>
+                                <span class="status-value" id="system-uptime">--</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="status-label">Comandos enviados:</span>
+                                <span class="status-value" id="commands-sent">--</span>
+                            </div>
+                        </div>
+
+                        <div class="status-card">
+                            <h3>🔌 Plugins</h3>
+                            <div class="status-item">
+                                <span class="status-label">Activos:</span>
+                                <span class="status-value" id="plugins-active">--</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="status-label">Total:</span>
+                                <span class="status-value" id="plugins-total">--</span>
+                            </div>
+                            <div class="plugin-list" id="plugin-list">--</div>
+                        </div>
+
+                        <div class="status-card">
+                            <h3>🛡️ Seguridad</h3>
+                            <div class="status-item">
+                                <span class="status-label">Estado:</span>
+                                <span class="status-value" id="security-status">--</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="status-label">Perfil activo:</span>
+                                <span class="status-value" id="security-profile">--</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="status-label">Alertas:</span>
+                                <span class="status-value" id="security-alerts">--</span>
+                            </div>
+                        </div>
+
+                        <div class="status-card">
+                            <h3>🌡️ Temperatura</h3>
+                            <div class="status-item">
+                                <span class="status-label">Monitoreo:</span>
+                                <span class="status-value" id="temp-monitoring">--</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="status-label">Historial:</span>
+                                <span class="status-value" id="temp-history">--</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="status-label">Alertas críticas:</span>
+                                <span class="status-value" id="temp-critical">--</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Print Statistics -->
+                    <div class="print-stats-section">
+                        <h3>🖨️ Estadísticas de Impresión</h3>
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <div class="stat-number" id="total-prints">--</div>
+                                <div class="stat-label">Impresiones totales</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number" id="success-rate">--%</div>
+                                <div class="stat-label">Tasa de éxito</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number" id="total-time">--h</div>
+                                <div class="stat-label">Tiempo total</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number" id="filament-used">--m</div>
+                                <div class="stat-label">Filamento usado</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Current Session -->
+                    <div class="current-session-section">
+                        <h3>📝 Sesión Actual</h3>
+                        <div class="session-info" id="current-session">
+                            <p>No hay sesión activa</p>
+                        </div>
+                    </div>
+
+                    <!-- Analysis Results -->
+                    <div class="analysis-section" id="analysis-results" style="display: none;">
+                        <h3>📊 Análisis de G-code</h3>
+                        <div class="analysis-summary">
+                            <div class="analysis-item">
+                                <span class="analysis-label">Complejidad:</span>
+                                <span class="analysis-value" id="analysis-complexity">--</span>
+                            </div>
+                            <div class="analysis-item">
+                                <span class="analysis-label">Tiempo estimado:</span>
+                                <span class="analysis-value" id="analysis-time">--</span>
+                            </div>
+                            <div class="analysis-item">
+                                <span class="analysis-label">Capas:</span>
+                                <span class="analysis-value" id="analysis-layers">--</span>
+                            </div>
+                            <div class="analysis-item">
+                                <span class="analysis-label">Calidad:</span>
+                                <span class="analysis-value" id="analysis-quality">--</span>
+                            </div>
+                        </div>
+                        
+                        <div class="analysis-issues" id="analysis-issues"></div>
+                        <div class="analysis-suggestions" id="analysis-suggestions"></div>
+                    </div>
+
+                    <!-- Control Buttons -->
+                    <div class="analytics-controls">
+                        <button id="refresh-analytics" class="btn btn-primary">🔄 Actualizar</button>
+                        <button id="export-stats" class="btn btn-secondary">💾 Exportar Datos</button>
+                        <button id="clear-history" class="btn btn-warning">🗑️ Limpiar Historial</button>
+                        <button id="debug-info" class="btn btn-info">🐛 Info Debug</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay hidden">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Conectando...</div>
+    </div>
+
+    <!-- Firebase Config -->
+    <script src="config.js"></script>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+
+    <!-- App Modules -->
+    <script type="module" src="src/utils/validate.js"></script>
+    <script type="module" src="src/utils/gcode.js"></script>
+    <script type="module" src="src/store.js"></script>
+    <script type="module" src="src/firebase.js"></script>
+    <script type="module" src="src/intents.js"></script>
+    <script type="module" src="src/gcodeStreamer.js"></script>
+    <script type="module" src="src/transports/serial.js"></script>
+    <script type="module" src="src/transports/bluetooth.js"></script>
+    <script type="module" src="src/transports/octoprint.js"></script>
+    <script type="module" src="src/transports/moonraker.js"></script>
+    <script type="module" src="src/ui.js"></script>
+    <script type="module" src="src/app.js"></script>
+
+    <!-- Service Worker -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+                .then(registration => console.log('SW registered:', registration))
+                .catch(error => console.log('SW registration failed:', error));
+        }
+    </script>
+</body>
+</html>

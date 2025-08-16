@@ -211,7 +211,8 @@ export class PluginManager {
       { name: 'gcodeAnalyzer', required: true },
       { name: 'printEstimator', required: false },
       { name: 'safetyManager', required: true },
-      { name: 'historyLogger', required: true }
+      { name: 'historyLogger', required: true },
+      { name: 'costCalculator', required: true }
     ];
 
     let loadedCount = 0;
